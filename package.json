@@ -1,0 +1,22 @@
+{
+  "name": "we-talk-backend",
+  "module": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/cookie": "^0.7.0",
+    "@elysiajs/jwt": "^0.7.0",
+    "elysia": "^0.7.17",
+    "mongoose": "^7.6.3",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1"
+  },
+  "scripts": {
+    "dev": "bun run index.js"
+  }
+}
