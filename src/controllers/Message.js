@@ -1,4 +1,5 @@
 import { Message } from "../schemas/Message";
+import { User } from "../schemas/User";
 
 export const create = async ({ body, set }) => {
     try {
@@ -12,9 +13,29 @@ export const create = async ({ body, set }) => {
     }
 }
 
-export const findByChat = async ({ body, set }) => {
+export const findByChat = async ({ auth, set }) => {
     try {
-        const messages = await Message.aggregate([{ $match: body }, { $group: { _id: { $dateToString: { format: "%d-%m-%Y", date: "$date" } } } }]);
+        const messages = await Message.aggregate([
+            { 
+                $match: {
+                    $or: [
+                        { to: auth.name },
+                        { from: auth.name }
+                    ]
+                }
+            },
+            {
+                $sort: {
+                    createdAt: 1 
+                }
+            },
+            {
+                $group: {
+                    _id: '$chat',
+                    messages: { $push: '$$ROOT' }
+                }
+            } 
+        ]);
 
         set.status = 200;
         return { message: "Ok", messages };

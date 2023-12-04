@@ -14,15 +14,15 @@ export const create = async ({ body, set }) => {
 
         user.password = null;
         set.status = 201;
-        return { "message": "Usuário criado", "user": user };
+        return { message: "Usuário criado", user: user };
     } catch(error) {
         console.log(error)
         if (error.code === 11000) { //duplicate name
             set.status = 403;
-            return { "message": "Esse nome já está em uso!" };
+            return { message: "Esse nome já está em uso!" };
         }
         set.status = 500;
-        return { "message": "Algo deu errado" };
+        return { message: "Algo deu errado" };
     }
 }
 
@@ -45,16 +45,16 @@ export const signIn = async ({ body, set, jwt, cookie, setCookie }) => {
                 user.password = null;
                 
                 set.status = 200;
-                return { "message": "Login realizado", "user": user };
+                return { message: "Login realizado", user: user };
             }
             set.status = 403;
-            return { "message": "Usuário/Senha incorretos" };
+            return { message: "Usuário/Senha incorretos" };
         }
         set.status = 403;
-        return { "message": "Este usuário não existe" };
+        return { message: "Este usuário não existe" };
     } catch(error) {
         set.status = 500;
-        return { "message": "Algo deu errado" };
+        return { message: "Algo deu errado" };
     }
 }
 
@@ -63,10 +63,10 @@ export const findAll = async ({ set }) => {
         const users = await User.find();
 
         set.status = 200;
-        return { "message": "Resultados encontrados", "users": users };
+        return { message: "Resultados encontrados", "users": users };
     } catch(error) {
         set.status = 500;
-        return { "message": "Algo deu errado" };
+        return { message: "Algo deu errado" };
     }
 }
 
@@ -81,11 +81,11 @@ export const getFeed = async ({ auth, set }) => {
         console.log(suggestions)
         
         set.status = 200;
-        return { "suggestions": suggestions };
+        return { suggestions: suggestions };
     }
 
     set.status = 401;
-    return { "message": "Sem token" };
+    return { message: "Sem token" };
 }
 
 export const getFollowers = async ({ auth, set }) => {
@@ -96,20 +96,20 @@ export const getFollowers = async ({ auth, set }) => {
 
             if (chats.length === 0) {
                 set.status = 200;
-                return { "followers": [] }
+                return { followers: [] }
             } 
 
             set.status = 200;
-            return { "followers": [] }
+            return { followers: [] }
 
         } catch(error) {
             set.status = 500;
-            return { "message": "Algo deu errado" };
+            return { message: "Algo deu errado" };
         }
     }
 
     set.status = 401;
-    return { "message": "Sem token" };
+    return { message: "Sem token" };
 }
 
 export const signOut = async ({ cookie, set }) => {
@@ -117,7 +117,7 @@ export const signOut = async ({ cookie, set }) => {
     console.log(cookie)
     
     set.status = 200;
-    return { "message": "Logout" };
+    return { message: "Logout" };
 }
 
 export const setBiography = async ({ auth, body, set }) => {
@@ -129,15 +129,15 @@ export const setBiography = async ({ auth, body, set }) => {
             user.save();
     
             set.status = 200;
-            return { "message": "Biografia alterada" };
+            return { message: "Biografia alterada" };
         } catch(error) {
             set.status = 500;
-            return { "message": "Algo deu errado" };
+            return { message: "Algo deu errado" };
         }
     }
 
     set.status = 401;
-    return { "message": "Sem token" };
+    return { message: "Sem token" };
 }
 
 export const setLanguages = async ({ auth, body, set }) => {
@@ -151,15 +151,15 @@ export const setLanguages = async ({ auth, body, set }) => {
             user.save();
     
             set.status = 200;
-            return { "message": "Dados alterados" };
+            return { message: "Dados alterados" };
         } catch(error) {
             set.status = 500;
-            return { "message": "Algo deu errado" };
+            return { message: "Algo deu errado" };
         }
     }
 
     set.status = 401;
-    return { "message": "Sem token" };
+    return { message: "Sem token" };
 }
 
 export const setImage = async ({ auth, body: { file } }) => {
@@ -172,13 +172,13 @@ export const setImage = async ({ auth, body: { file } }) => {
                 console.log("oi")
             } catch(error) {
                 set.status = 500;
-                return { "message": "Algo deu errado" };
+                return { message: "Algo deu errado" };
             }
         }
     }
 
     set.status = 401;
-    return { "message": "Sem token" };
+    return { message: "Sem token" };
 }
 
 export const findById = async (id) => {
