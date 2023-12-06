@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 
-const User = require("../schemas/User");
-const Message = require("../schemas/Message");
+const { User } = require("../schemas/User");
+const { Message } = require("../schemas/Message");
 
 const sockets = new Map();
 
 export const events = {
     "open": async (ws, data) => {
+        console.log("opening socket")
         const id = data.id;
         const user = await User.findById(id);
 
@@ -16,13 +17,14 @@ export const events = {
 
             sockets.set(ws.id, ws);
 
-            ws.send(JSON.stringify({ id: "connected", data: {  } }));
+            ws.send(JSON.stringify({ id: "connected", data: {} }));
             return;
         }
 
         return;
     },
     "close": async (ws, data) => {
+        console.log("closing socket")
         const id = data.id;
         const user = await User.findById(id);
 

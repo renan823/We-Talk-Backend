@@ -71,14 +71,11 @@ export const findAll = async ({ set }) => {
 }
 
 export const getFeed = async ({ auth, set }) => {
-    console.log(auth)
-    console.log("hehehehe")
     if (auth) {
         const user = await User.findById(auth.id);
         const suggestion = await Suggestion.create(user);
         
         const suggestions = await User.find({ name: suggestion.users });
-        console.log(suggestions)
         
         set.status = 200;
         return { suggestions: suggestions };
@@ -92,7 +89,6 @@ export const getFollowers = async ({ auth, set }) => {
     if (auth) {
         try {
             const chats = await Chat.find({ users: auth.name });
-            console.log(chats);
 
             if (chats.length === 0) {
                 set.status = 200;
@@ -114,7 +110,6 @@ export const getFollowers = async ({ auth, set }) => {
 
 export const signOut = async ({ cookie, set }) => {
     delete cookie.auth;
-    console.log(cookie)
     
     set.status = 200;
     return { message: "Logout" };

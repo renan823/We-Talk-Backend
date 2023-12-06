@@ -16,20 +16,18 @@ const match = async (user) => {
     suggestions.forEach(suggestion => {
         const x = jaccard(user.learn, suggestion.learn);
         const y = jaccard(user.speak, suggestion.speak);
-        //Testar variações desse algoritmo para ver resultados melhores (ou piores)
 
         result.push([suggestion.name, x + y]);
     })
 
     result.sort(([a, b], [c, d]) => d - b);
-    //ordenar pelo maior indice de jaccard
 
     return result;
 }
   
 const sample = async (user) => {
     const suggestions = await User.aggregate([
-        { $sample: { size: 20 } }, //mudar esse valor no futuro
+        { $sample: { size: 20 } }, 
         { $match: { name: { $ne: user.name } } } 
     ])
 
@@ -37,9 +35,11 @@ const sample = async (user) => {
 }
 
 export const create = async (user) => {
+    console.log("usuário", user)
     if (user) {
+        let suggestion = [];
         const date = new Date();
-        //essa consulta é muito complexa e o chatgpt deu um help
+        
         const count = await Suggestion.countDocuments({ to: user.name, $expr: {
             $or: [
                 { $lt: [{ $year: "$createdAt" }, date.getFullYear()] },
@@ -56,15 +56,14 @@ export const create = async (user) => {
         } });
 
         if (count !== 0) {
-            console.log("deleting");
             await Suggestion.deleteMany({ to: user.name });
-
-            const result = (await match(user)).slice(0, 10);
-            const users = result.map(data => data[0]);
-            await Suggestion.create({ to: user.name, users });
         }
 
-        const suggestion = await Suggestion.findOne({ to: user.name });
+        const result = (await match(user)).slice(0, 10);
+        const users = result.map(data => data[0]);
+        await Suggestion.create({ to: user.name, users });
+
+        suggestion = await Suggestion.findOne({ to: user.name });
         return suggestion;
     }
 }

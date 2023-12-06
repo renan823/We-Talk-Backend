@@ -45,7 +45,6 @@ app.derive(async ({ request, cookie, jwt, set }) => {
 app.ws("/", {
     async open(ws) {
         console.log("connected", ws.id);
-        eventListener({ event: "open" }, ws);
     },
     async message(ws, message) {
         eventListener(message, ws);
