@@ -9,15 +9,16 @@ export const create = async ({ auth, body, set }) => {
     
             const users = await User.find({ name: { $in: pair }});
             if (users.length === 2) {
-                const chat = await Chat.count({ users: pair });
-                if (!chat) {
-                    const newChat = await Chat.create({ users: pair });
+                const result = await Chat.find({ users: pair });
+                
+                if (result.length === 0) {
+                    const chat = await Chat.create({ users: pair });
     
                     set.status = 200;
-                    return { message: "Ok", newChat };
+                    return { message: "Ok", chat: chat };
                 }
                 set.status = 201;
-                return { message: "Ok", chat };
+                return { message: "Ok", chat: result[0] };
             }
         } catch(error) {
             set.status = 500;
@@ -33,7 +34,6 @@ export const findAllByUser = async ({ auth, set }) => {
     if (auth) {
         try {
             const chats = await Chat.find({ users: auth.name });
-            console.log(await Chat.find())
     
             set.status = 200;
             return { message: "Ok", chats };

@@ -27,7 +27,6 @@ app.use(cookie());
 const routes = ["sign-up", "sign-in"]
 app.derive(async ({ request, cookie, jwt, set }) => {
     const auth = await jwt.verify(cookie.auth);
-    console.log(auth)
     
     const route = request.url.split("/").slice(-1)[0];
     if (routes.includes(route)) {
@@ -47,12 +46,12 @@ app.ws("/", {
         console.log("connected", ws.id);
     },
     async message(ws, message) {
+        console.log("message received")
         eventListener(message, ws);
         ws.send(message);
     },
     async close(ws) {
        console.log("disconnected", ws.id);
-       eventListener({ event: "close" }, ws);
     }
 });
 
@@ -73,12 +72,15 @@ app.group("/user", app => app
     .get("/followers", User.getFollowers)
     .get("/feed", User.getFeed)
     .get("/sign-out", User.signOut)
+    .post("/find", User.findById)
 );
    
 //chat routes
 app.group("chat", app => app 
     .post("/new", Chat.create)
     .get("/all", Chat.findAllByUser)
+    .post("/send", Message.create)
+    .post("/messages", Message.findByChat)
 );
     
 //server connection

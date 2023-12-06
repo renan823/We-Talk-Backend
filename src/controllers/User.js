@@ -16,7 +16,6 @@ export const create = async ({ body, set }) => {
         set.status = 201;
         return { message: "Usuário criado", user: user };
     } catch(error) {
-        console.log(error)
         if (error.code === 11000) { //duplicate name
             set.status = 403;
             return { message: "Esse nome já está em uso!" };
@@ -76,7 +75,7 @@ export const getFeed = async ({ auth, set }) => {
         const suggestion = await Suggestion.create(user);
         
         const suggestions = await User.find({ name: suggestion.users });
-        
+
         set.status = 200;
         return { suggestions: suggestions };
     }
@@ -90,13 +89,23 @@ export const getFollowers = async ({ auth, set }) => {
         try {
             const chats = await Chat.find({ users: auth.name });
 
+            let followers = [];
+
             if (chats.length === 0) {
                 set.status = 200;
-                return { followers: [] }
+                return { followers }
             } 
 
+            chats.forEach(chat => {
+                chat.users.forEach(user => {
+                    if (user !== auth.name && !followers.includes(user)) {
+                        followers.push(user)
+                    }
+                })
+            })
+
             set.status = 200;
-            return { followers: [] }
+            return { followers }
 
         } catch(error) {
             set.status = 500;
@@ -138,7 +147,6 @@ export const setBiography = async ({ auth, body, set }) => {
 export const setLanguages = async ({ auth, body, set }) => {
     if (auth ) {
         try {
-            console.log(auth.id, body.id)
             const user = await User.findById(auth.id);
     
             user.learn = body.learn;
@@ -162,9 +170,8 @@ export const setImage = async ({ auth, body: { file } }) => {
         if (file) {
 
             const [ id, extension ] = file.name.split(".");
-            console.log(id)
             try {
-                console.log("oi")
+
             } catch(error) {
                 set.status = 500;
                 return { message: "Algo deu errado" };
@@ -176,9 +183,11 @@ export const setImage = async ({ auth, body: { file } }) => {
     return { message: "Sem token" };
 }
 
-export const findById = async (id) => {
-    const user = await User.findById(id);
-    return user;
+export const findById = async (body, set) => {
+    const user = await User.findById(body.id);
+
+    set.status = 200;
+    return { user };
 }
 
 export const findOne = async (body) => {

@@ -1,5 +1,6 @@
 import { Suggestion } from "../schemas/Suggestion";
 import { User } from "../schemas/User";
+import moment from "moment";
 
 const jaccard = (list1, list2) => {
     const intersection = new Set([...list1].filter(x => list2.includes(x))).size;
@@ -35,25 +36,11 @@ const sample = async (user) => {
 }
 
 export const create = async (user) => {
-    console.log("usuário", user)
     if (user) {
         let suggestion = [];
-        const date = new Date();
+        const date = moment().startOf("day");
         
-        const count = await Suggestion.countDocuments({ to: user.name, $expr: {
-            $or: [
-                { $lt: [{ $year: "$createdAt" }, date.getFullYear()] },
-                { $and: [
-                    { $eq: [{ $year: "$createdAt" }, date.getFullYear()] },
-                    { $lt: [{ $month: "$createdAt" }, date.getMonth() +1] }
-                ]},
-                { $and: [
-                    { $eq: [{ $year: "$createdAt" }, date.getFullYear() +1] },
-                    { $eq: [{ $month: "$createdAt" }, date.getMonth()] },
-                    { $lt: [{ $dayOfMonth: "$createdAt" }, date.getDate()] }
-                ]}
-            ]
-        } });
+        const count = await Suggestion.countDocuments({ to: user.name, createdAt: { $lt: date.toDate() }});
 
         if (count !== 0) {
             await Suggestion.deleteMany({ to: user.name });
@@ -61,7 +48,7 @@ export const create = async (user) => {
 
         const result = (await match(user)).slice(0, 10);
         const users = result.map(data => data[0]);
-        await Suggestion.create({ to: user.name, users });
+        await Suggestion.create({ to: user.name, users, createdAt: moment().startOf("day").toDate() });
 
         suggestion = await Suggestion.findOne({ to: user.name });
         return suggestion;

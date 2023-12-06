@@ -40,8 +40,10 @@ export const events = {
         await Message.create(data.message);
 
         const id = data.id;
-        const user = await User.find({ where: { _id: id } });
+        const user = await User.findById(id);
         const target = user.socket;
+
+        console.log(data.message)
 
         if (target) {
             sockets(target).send(JSON.stringify(data.message));
@@ -58,9 +60,8 @@ export const events = {
 }
 
 
-export const eventListener = (data, ws) => {
-    console.log(data, ws)
-    events[data.event](ws, data);
+export const eventListener = (message, ws) => {
+    events[message.event](ws, message.data);
 }
 
 // const messages = await Message.aggregate([{ $match: { $or: [{ to: user.name }, { from: user.name }] } }, { $group: { _id: '$chat' } }]);

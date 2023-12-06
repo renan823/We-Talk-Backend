@@ -3,7 +3,8 @@
   "module": "index.js",
   "type": "module",
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "nodemon": "^3.0.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -12,6 +13,7 @@
     "@elysiajs/cookie": "^0.7.0",
     "@elysiajs/jwt": "^0.7.0",
     "elysia": "^0.7.17",
+    "moment": "^2.29.4",
     "mongoose": "^7.6.3",
     "multer": "^1.4.5-lts.1",
     "uuid": "^9.0.1"
