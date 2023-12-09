@@ -27,6 +27,7 @@ app.use(cookie());
 const routes = ["sign-up", "sign-in"]
 app.derive(async ({ request, cookie, jwt, set }) => {
     const auth = await jwt.verify(cookie.auth);
+    console.log(auth)
     
     const route = request.url.split("/").slice(-1)[0];
     if (routes.includes(route)) {
@@ -36,7 +37,6 @@ app.derive(async ({ request, cookie, jwt, set }) => {
     if (auth) {
         return { auth };
     }
-    console.log("hi")
     return;
 });
 

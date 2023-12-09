@@ -3,22 +3,17 @@ import mongoose from "mongoose";
 const { User } = require("../schemas/User");
 const { Message } = require("../schemas/Message");
 
-const sockets = new Map();
+export const sockets = new Map();
 
 export const events = {
     "open": async (ws, data) => {
-        console.log("opening socket")
-        const id = data.id;
-        const user = await User.findById(id);
+        console.log("opening socket");
+        const user = data.name;
 
         if (user) {
-            user.socket = ws.id;
-            user.save();
-
-            sockets.set(ws.id, ws);
-
-            ws.send(JSON.stringify({ id: "connected", data: {} }));
-            return;
+            if (! sockets.has(user)) {
+                sockets.set(user, ws);
+            }
         }
 
         return;
@@ -29,31 +24,28 @@ export const events = {
         const user = await User.findById(id);
 
         if (user) {
-            user.socket = null;
-            user.save();
+            sockets.delete(user.name);
         }
 
         return;
     },
     "send": async (ws, data) => {
 
-        await Message.create(data.message);
+        const message = await Message.create(data.message);
 
-        const id = data.id;
-        const user = await User.findById(id);
-        const target = user.socket;
+        const user = data.message.to;
+        data.message = message;
 
-        console.log(data.message)
-
-        if (target) {
-            sockets(target).send(JSON.stringify(data.message));
+        if (sockets.has(user)) {
+            const socket = sockets.get(user);
+            socket.send(JSON.stringify({ event: 'send', data }));
         }
 
         return;
     },
     "received": async (ws, data) => {
         const lastDate = data.lastDate;
-        const chat = mongoose.Types.ObjectId(data.chat)
+        const chat = mongoose.Types.ObjectId(data.chat);
 
         await Message.updateMany({ date: { $lt: lastDate }, chat: chat }, { $set: { status: "received" } });
     }

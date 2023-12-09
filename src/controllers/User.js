@@ -36,6 +36,8 @@ export const signIn = async ({ body, set, jwt, cookie, setCookie }) => {
             const match = await Bun.password.verify(password, hash);
             if (match) {
 
+                delete cookie['auth'];
+
                 setCookie('auth', await jwt.sign({ name: user.name, id: user.id }), {
                     httpOnly: true,
                     maxAge: 7 * 86400,
