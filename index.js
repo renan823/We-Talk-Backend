@@ -8,6 +8,7 @@ import * as Language from "./src/controllers/Language";
 import * as Chat from "./src/controllers/Chat";
 import * as Message from "./src/controllers/Message";
 import { eventListener } from "./src/services/eventListener";
+import { swagger } from "@elysiajs/swagger";
 
 await mongoose.connect(process.env.DB_URL)
     .then(() => {
@@ -22,6 +23,7 @@ const app = new Elysia();
 //middlewares
 app.use(jwt({ name: 'jwt', secret: process.env.SECRET }));
 app.use(cookie());
+app.use(swagger());
 
 //auth routes
 const routes = ["sign-up", "sign-in"]
