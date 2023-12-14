@@ -9,6 +9,7 @@ import * as Chat from "./src/controllers/Chat";
 import * as Message from "./src/controllers/Message";
 import { eventListener } from "./src/services/eventListener";
 import { swagger } from "@elysiajs/swagger";
+import { staticPlugin } from "@elysiajs/static";
 
 await mongoose.connect(process.env.DB_URL)
     .then(() => {
@@ -24,6 +25,7 @@ const app = new Elysia();
 app.use(jwt({ name: 'jwt', secret: process.env.SECRET }));
 app.use(cookie());
 app.use(swagger());
+//app.use(staticPlugin("public", "/public"))
 
 //auth routes
 const routes = ["sign-up", "sign-in"]
@@ -70,11 +72,12 @@ app.group("/user", app => app
     .get("/find-all", User.findAll)
     .post("/update-status", User.setBiography)
     .post("/update-languages", User.setLanguages)
-    .post("/update-image", User.setImage)
     .get("/followers", User.getFollowers)
     .get("/feed", User.getFeed)
     .get("/sign-out", User.signOut)
     .post("/find", User.findById)
+    .post("/update-image", User.setImage)
+    .post("/image", User.getImage)
 );
    
 //chat routes

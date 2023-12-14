@@ -167,18 +167,55 @@ export const setLanguages = async ({ auth, body, set }) => {
     return { message: "Sem token" };
 }
 
-export const setImage = async ({ auth, body: { file } }) => {
+export const setImage = async ({ auth, body: { file }, set }) => {
     if (auth) {
         if (file) {
+            const path = "public/";
+            const extension = file.name.split(".")[1];
 
-            const [ id, extension ] = file.name.split(".");
+            const user = await User.findById(auth.id)
+
             try {
+                await Bun.write(Bun.file(`${path}${auth.id}.${extension}`), file);
+                user.extension = extension;
+                user.save;
 
-            } catch(error) {
+                set.status = 200;
+                return { message: "Ok" };
+            } catch(e){
+                console.log(e);
+
                 set.status = 500;
-                return { message: "Algo deu errado" };
+                return { message: "Algo deu errado!" };
             }
         }
+
+        set.status = 500;
+        return { message: "Algo deu errado!" };
+    }
+
+    set.status = 401;
+    return { message: "Sem token" };
+}
+
+export const getImage = async ({auth, body, set}) => {
+    if (auth) {
+        const user = await User.findById(body.id)
+
+        if (user.extension) {
+            const file = Bun.file(`public/${body.id}.${user.extension}`);
+            console.log(file)
+            if (file) {
+                set.status = 200;
+                return { message: "Ok", image: file }
+            }
+
+            set.status = 500;
+            return { message: "Algo deu errado!" };
+        }
+
+        set.status = 200;
+        return { message: "Ok", image: null }
     }
 
     set.status = 401;
